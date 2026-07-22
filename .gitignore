@@ -141,3 +141,6 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# Baig Tours MERN Development Blueprint
+Baig_Tours_MERN_Development_Blueprint.md
