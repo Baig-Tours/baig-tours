@@ -1,5 +1,6 @@
 const Blog = require('../models/Blog');
 const { successResponse, errorResponse } = require('../utils/apiResponse');
+const APIFeatures = require('../utils/apiFeatures');
 
 /**
  * @desc    Get public blogs (published only) with pagination, search, category & tag filters
@@ -8,30 +9,11 @@ const { successResponse, errorResponse } = require('../utils/apiResponse');
  */
 const getPublicBlogs = async (req, res, next) => {
   try {
-    const { category, tag, search, page = 1, limit = 9 } = req.query;
-
-    const pageNum = parseInt(page, 10) || 1;
-    const limitNum = parseInt(limit, 10) || 9;
-    const skip = (pageNum - 1) * limitNum;
-
-    // Filter criteria: Published posts only for public view
-    const queryFilter = { status: 'published' };
-
-    if (category) {
-      queryFilter.category = { $regex: new RegExp(`^${category}$`, 'i') };
-    }
-
-    if (tag) {
-      queryFilter.tags = { $in: [tag] };
-    }
-
-    if (search) {
-      queryFilter.$text = { $search: search };
-    }
-
     // If MongoDB is not connected (e.g. unit testing without DB connection)
     const mongoose = require('mongoose');
     if (mongoose.connection.readyState !== 1) {
+      const pageNum = parseInt(req.query.page, 10) || 1;
+      const limitNum = parseInt(req.query.limit, 10) || 9;
       return successResponse(res, 200, 'Blogs fetched successfully (Offline Mode)', [], {
         total: 0,
         page: pageNum,
@@ -40,21 +22,23 @@ const getPublicBlogs = async (req, res, next) => {
       });
     }
 
+    const features = new APIFeatures(Blog.find(), req.query)
+      .filter({ status: 'published' })
+      .search()
+      .sort({ publishDate: -1 })
+      .paginate(9);
+
     const [blogs, total] = await Promise.all([
-      Blog.find(queryFilter)
-        .sort(search ? { score: { $meta: 'textScore' }, publishDate: -1 } : { publishDate: -1 })
-        .skip(skip)
-        .limit(limitNum)
-        .lean(),
-      Blog.countDocuments(queryFilter),
+      features.query.lean(),
+      Blog.countDocuments(features.queryFilter),
     ]);
 
-    const totalPages = Math.ceil(total / limitNum) || 1;
+    const totalPages = Math.ceil(total / features.limit) || 1;
 
     return successResponse(res, 200, 'Blogs fetched successfully', blogs, {
       total,
-      page: pageNum,
-      limit: limitNum,
+      page: features.page,
+      limit: features.limit,
       totalPages,
     });
   } catch (error) {
@@ -103,28 +87,10 @@ const getBlogBySlug = async (req, res, next) => {
  */
 const getAdminBlogs = async (req, res, next) => {
   try {
-    const { status, search, page = 1, limit = 10 } = req.query;
-
-    const pageNum = parseInt(page, 10) || 1;
-    const limitNum = parseInt(limit, 10) || 10;
-    const skip = (pageNum - 1) * limitNum;
-
-    const queryFilter = {};
-
-    if (status && ['draft', 'published'].includes(status.toLowerCase())) {
-      queryFilter.status = status.toLowerCase();
-    }
-
-    if (search) {
-      queryFilter.$or = [
-        { title: { $regex: search, $options: 'i' } },
-        { category: { $regex: search, $options: 'i' } },
-        { author: { $regex: search, $options: 'i' } },
-      ];
-    }
-
     const mongoose = require('mongoose');
     if (mongoose.connection.readyState !== 1) {
+      const pageNum = parseInt(req.query.page, 10) || 1;
+      const limitNum = parseInt(req.query.limit, 10) || 10;
       return successResponse(res, 200, 'Admin blogs fetched successfully (Offline Mode)', [], {
         total: 0,
         page: pageNum,
@@ -133,21 +99,28 @@ const getAdminBlogs = async (req, res, next) => {
       });
     }
 
+    const baseFilter = {};
+    if (req.query.status && ['draft', 'published'].includes(req.query.status.toLowerCase())) {
+      baseFilter.status = req.query.status.toLowerCase();
+    }
+
+    const features = new APIFeatures(Blog.find(), req.query)
+      .filter(baseFilter)
+      .search(['title', 'category', 'author'])
+      .sort({ updatedAt: -1 })
+      .paginate(10);
+
     const [blogs, total] = await Promise.all([
-      Blog.find(queryFilter)
-        .sort({ updatedAt: -1 })
-        .skip(skip)
-        .limit(limitNum)
-        .lean(),
-      Blog.countDocuments(queryFilter),
+      features.query.lean(),
+      Blog.countDocuments(features.queryFilter),
     ]);
 
-    const totalPages = Math.ceil(total / limitNum) || 1;
+    const totalPages = Math.ceil(total / features.limit) || 1;
 
     return successResponse(res, 200, 'Admin blogs fetched successfully', blogs, {
       total,
-      page: pageNum,
-      limit: limitNum,
+      page: features.page,
+      limit: features.limit,
       totalPages,
     });
   } catch (error) {
