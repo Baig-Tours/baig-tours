@@ -4,6 +4,7 @@ const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
 
 const authRoutes = require('./routes/authRoutes');
+const packageRoutes = require('./routes/packageRoutes');
 const notFoundMiddleware = require('./middleware/notFoundMiddleware');
 const { errorMiddleware } = require('./middleware/errorMiddleware');
 
@@ -13,7 +14,7 @@ const app = express();
 app.use(
   cors({
     origin: process.env.CLIENT_URL || 'http://localhost:5173',
-    credentials: true, // required so the browser sends/receives the httpOnly cookie
+    credentials: true,
   })
 );
 app.use(express.json({ limit: '10mb' }));
@@ -30,12 +31,8 @@ app.get('/api/health', (req, res) => {
 });
 
 // ── Route mounts ─────────────────────────────────────────────
-// Every module mounts its router here, one line each, e.g.:
-//   app.use('/api/packages', packageRoutes);
-//   app.use('/api/admin/packages', adminPackageRoutes);
-// Dev 1 owns this file for the platform-core wiring below; other devs'
-// mount lines are added via PR against this section as their modules land.
 app.use('/api/auth', authRoutes);
+app.use('/api', packageRoutes);
 
 // ── 404 + centralized error handling (must be registered LAST) ──
 app.use(notFoundMiddleware);

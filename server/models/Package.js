@@ -42,7 +42,7 @@ const packageSchema = new Schema(
   {
     title: { type: String, required: true, trim: true },
 
-    slug: { type: String, unique: true, index: true },
+    slug: { type: String, unique: true },
 
     category: {
       type: Schema.Types.ObjectId,
@@ -107,7 +107,6 @@ const packageSchema = new Schema(
 );
 
 // Indexes for how the frontend actually queries packages (Section 2.4)
-packageSchema.index({ slug: 1 });
 packageSchema.index({ destination: 1 });
 packageSchema.index({ category: 1 });
 packageSchema.index({ price: 1 });
