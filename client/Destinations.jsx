@@ -4,7 +4,7 @@ import {
   createDestination,
   updateDestination,
   deleteDestination,
-} from '../../api/destinationApi';
+} from './destinationApi';
 
 const Destinations = () => {
   const [destinations, setDestinations] = useState([]);

@@ -3,6 +3,9 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import Categories from './pages/admin/Categories';
 import Destinations from './pages/admin/Destinations';
 import Gallery from './pages/Gallery';
+import Packages from './pages/public/Packages';
+import PackagesList from './pages/admin/Packages/PackagesList';
+import PackageForm from './pages/admin/Packages/PackageForm';
 
 function App() {
   return (
@@ -19,6 +22,12 @@ function App() {
           <Link to="/gallery" className="hover:text-indigo-400 transition">
             Public Gallery
           </Link>
+          <Link to="/packages" className="hover:text-indigo-400 transition">
+            Public Packages
+          </Link>
+          <Link to="/admin/packages" className="hover:text-indigo-400 transition">
+            Packages Admin
+          </Link>
         </nav>
 
         {/* Page Content */}
@@ -27,6 +36,10 @@ function App() {
             <Route path="/admin/categories" element={<Categories />} />
             <Route path="/admin/destinations" element={<Destinations />} />
             <Route path="/gallery" element={<Gallery />} />
+            <Route path="/packages" element={<Packages />} />
+            <Route path="/admin/packages" element={<PackagesList />} />
+            <Route path="/admin/packages/new" element={<PackageForm />} />
+            <Route path="/admin/packages/:id/edit" element={<PackageForm />} />
             <Route path="/" element={<Gallery />} />
           </Routes>
         </main>
