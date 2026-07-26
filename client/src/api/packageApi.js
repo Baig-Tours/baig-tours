@@ -19,8 +19,14 @@ export const createPackage = (formData) =>
     })
     .then((res) => res.data);
 
-export const updatePackage = (id, data) =>
-  axiosClient.put(`/admin/packages/${id}`, data).then((res) => res.data);
+export const updatePackage = (id, formData) =>
+  axiosClient
+    .put(`/admin/packages/${id}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })
+    .then((res) => res.data);
 
 export const deletePackage = (id) =>
   axiosClient.delete(`/admin/packages/${id}`).then((res) => res.data);
+export const duplicatePackage = (id) =>
+  axiosClient.post(`/admin/packages/${id}/duplicate`).then((res) => res.data);

@@ -40,6 +40,7 @@ router.put(
   '/admin/packages/:id',
   verifyToken,
   requireAdmin(),
+  upload.array('images', 10),
   updatePackageRules,
   validate,
   updatePackage
