@@ -2,6 +2,22 @@ const apiResponse = require('../utils/apiResponse');
 const Package = require('../models/Package');
 const { uploadBuffer } = require('../services/cloudinaryService');
 
+const JSON_FIELDS = ['itinerary', 'faqs', 'included', 'excluded', 'highlights', 'seo'];
+
+function parseJsonFields(body) {
+  const parsed = { ...body };
+  JSON_FIELDS.forEach((field) => {
+    if (typeof parsed[field] === 'string') {
+      try {
+        parsed[field] = JSON.parse(parsed[field]);
+      } catch (e) {
+        // leave as-is if it wasn't actually JSON
+      }
+    }
+  });
+  return parsed;
+}
+
 // ---- Public endpoints ----
 exports.getPackages = async (req, res) => {
   try {
@@ -56,7 +72,7 @@ exports.getPackages = async (req, res) => {
       true,
       'Packages fetched successfully',
       packages,
-      null,
+      { total, page: pageNum, limit: limitNum, totalPages: Math.ceil(total / limitNum) },
       200
     );
   } catch (err) {
@@ -123,18 +139,7 @@ exports.createPackage = async (req, res) => {
     }
 
     const [firstUpload, ...restUploads] = uploads;
-
-    const jsonFields = ['itinerary', 'faqs', 'included', 'excluded', 'highlights', 'seo'];
-    const parsedBody = { ...req.body };
-    jsonFields.forEach((field) => {
-      if (typeof parsedBody[field] === 'string') {
-        try {
-          parsedBody[field] = JSON.parse(parsedBody[field]);
-        } catch (e) {
-          // leave as-is if it wasn't actually JSON
-        }
-      }
-    });
+    const parsedBody = parseJsonFields(req.body);
 
     const newPackage = await Package.create({
       ...parsedBody,
@@ -157,7 +162,14 @@ exports.createPackage = async (req, res) => {
 
 exports.updatePackage = async (req, res) => {
   try {
-    const updated = await Package.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const updateData = parseJsonFields(req.body);
+
+    if (req.files && req.files.length > 0) {
+      const result = await uploadBuffer(req.files[0].buffer, 'baig-tours/packages', 'image');
+      updateData.featuredImage = { url: result.url, publicId: result.publicId };
+    }
+
+    const updated = await Package.findByIdAndUpdate(req.params.id, updateData, { new: true });
     if (!updated) {
       return apiResponse(res, false, 'Package not found', null, [], 404);
     }

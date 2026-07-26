@@ -4,6 +4,7 @@ import Categories from '../Categories';
 import Destinations from '../Destinations';
 import Gallery from '../Gallery';
 import Packages from './pages/public/Packages';
+import PackageDetails from './pages/public/PackageDetails';
 import PackagesList from './pages/admin/Packages/PackagesList';
 import PackageForm from './pages/admin/Packages/PackageForm';
 
@@ -35,6 +36,7 @@ function App() {
             <Route path="/admin/destinations" element={<Destinations />} />
             <Route path="/gallery" element={<Gallery />} />
             <Route path="/packages" element={<Packages />} />
+            <Route path="/packages/:slug" element={<PackageDetails />} />
             <Route path="/admin/packages" element={<PackagesList />} />
             <Route path="/admin/packages/new" element={<PackageForm />} />
             <Route path="/admin/packages/:id/edit" element={<PackageForm />} />
