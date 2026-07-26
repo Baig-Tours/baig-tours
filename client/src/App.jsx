@@ -1,122 +1,49 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import Categories from '../Categories';
+import Destinations from '../Destinations';
+import Gallery from '../Gallery';
+import Packages from './pages/public/Packages';
+import PackagesList from './pages/admin/Packages/PackagesList';
+import PackageForm from './pages/admin/Packages/PackageForm';
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <Router>
+      <div className="min-h-screen bg-slate-50">
+        <nav className="bg-slate-900 text-white p-4 flex gap-6 justify-center font-medium shadow-md">
+          <Link to="/admin/categories" className="hover:text-indigo-400 transition">
+            Categories Admin
+          </Link>
+          <Link to="/admin/destinations" className="hover:text-indigo-400 transition">
+            Destinations Admin
+          </Link>
+          <Link to="/gallery" className="hover:text-indigo-400 transition">
+            Public Gallery
+          </Link>
+          <Link to="/packages" className="hover:text-indigo-400 transition">
+            Public Packages
+          </Link>
+          <Link to="/admin/packages" className="hover:text-indigo-400 transition">
+            Packages Admin
+          </Link>
+        </nav>
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+        <main className="py-6">
+          <Routes>
+            <Route path="/admin/categories" element={<Categories />} />
+            <Route path="/admin/destinations" element={<Destinations />} />
+            <Route path="/gallery" element={<Gallery />} />
+            <Route path="/packages" element={<Packages />} />
+            <Route path="/admin/packages" element={<PackagesList />} />
+            <Route path="/admin/packages/new" element={<PackageForm />} />
+            <Route path="/admin/packages/:id/edit" element={<PackageForm />} />
+            <Route path="/" element={<Gallery />} />
+          </Routes>
+        </main>
+      </div>
+    </Router>
+  );
 }
 
-export default App
+export default App;

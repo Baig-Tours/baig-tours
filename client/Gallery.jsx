@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { getGalleryItems, createGalleryItem, deleteGalleryItem } from '../api/galleryApi';
-import { getCategories } from '../api/categoryApi';
+import { getGalleryItems, createGalleryItem, deleteGalleryItem } from './galleryApi';
+import { getCategories } from './categoryApi';
 
 const Gallery = () => {
   const [items, setItems] = useState([]);
